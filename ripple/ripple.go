@@ -13,18 +13,20 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-
+	
+	//Screen
 	screen := NewScreen(width, height)
-
 	screen.Enable()
 	defer screen.Disable()
-
+	
+	//Raw terminal
 	oldState, err := term.MakeRaw(fd)
 	if err != nil {
 		panic(err)
 	}
 	defer term.Restore(fd, oldState)
-
+	
+	//Run loop
 	run(screen)
 }
 
@@ -33,36 +35,25 @@ var running bool = false
 func run(screen *Screen) {
 	running = true
 
-	inputChan := make(chan byte)
-	go readInputLoop(inputChan)
+	inputCh := getInputChannel()
 
+	last := time.Now()
 	for running {
-		handleInput(inputChan)
+
+		input := getInput(inputCh)
+
+		now := time.Now()
+		delta := now.Sub(last).Seconds()
+		last = now
+
+		update(delta, input)
 
 		screen.Render()
-
-		//Shleep (~60 fps)
-		time.Sleep(16 * time.Millisecond)
 	}
 }
 
-func handleInput(inputChan <-chan byte) {
-	select {
-	case b := <-inputChan:
-		switch b {
-		case 'q', 3:
-			running = false
-		}
-	default:
-	}
-}
-
-var b [1]byte
-func readInputLoop(ch chan<- byte) {
-	for {
-		_, err := os.Stdin.Read(b[:])
-		if err == nil {
-			ch <- b[0]
-		}
+func update(_ float64, input Input) {
+	if input.Key == 'q' {
+		running = false
 	}
 }

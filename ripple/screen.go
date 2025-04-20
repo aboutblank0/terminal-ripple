@@ -7,13 +7,13 @@ import (
 
 type Screen struct {
 	Enabled bool
-	Width  int
-	Height int
-	Cells  [][]*Cell
+	Width   int
+	Height  int
+	Cells   [][]*Cell
 }
 
 type Cell struct {
-	Color terminal.BackgroundColor
+	Color   terminal.BackgroundColor
 	Content string
 }
 
@@ -26,7 +26,7 @@ func NewScreen(width, height int) *Screen {
 	for y := range height {
 		cols[y] = make([]*Cell, width)
 		for x := range cols[y] {
-			cols[y][x] = &Cell{ Color: terminal.BlackColor, Content: string(' ')}
+			cols[y][x] = &Cell{Color: terminal.BlackColor, Content: string(' ')}
 		}
 	}
 
@@ -38,7 +38,7 @@ func (s *Screen) Render() {
 	terminal.MoveCursor(0, 0)
 	for y := range s.Cells {
 		for _, cell := range s.Cells[y] {
-			terminal.SetBackgroundColor(cell.Color)
+			terminal.SetBackgroundColor(cell.Color) //TODO: Fix how many times this is called
 			fmt.Print(cell.Content)
 		}
 	}
@@ -50,10 +50,12 @@ func (s *Screen) Enable() {
 	terminal.SaveCursor()
 	terminal.SaveScreen()
 	terminal.SetCursorInvisible()
+	terminal.EnableMouseTracking()
 }
 
 func (s *Screen) Disable() {
 	terminal.RestoreScreen()
 	terminal.RestoreCursor()
 	terminal.SetCursorVisible()
+	terminal.DisableMouseTracking()
 }
