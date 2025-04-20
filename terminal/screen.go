@@ -1,4 +1,4 @@
-package simplegui
+package terminal
 
 import "fmt"
 

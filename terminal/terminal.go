@@ -1,4 +1,4 @@
-package simplegui
+package terminal
 
 import (
 	"fmt"
@@ -20,17 +20,17 @@ const (
 	DefaultColor                 = 8
 )
 
-func SendAnsi(ansi string) {
+func PrintAnsi(ansi string) {
 	fmt.Printf("%s%s", ESC, ansi)
 }
 
 func SetBackgroundColor(color BackgroundColor) {
 	EraseScreen()
 	s := fmt.Sprintf("[48;5;%vm", color)
-	SendAnsi(s)
+	PrintAnsi(s)
 }
 
 func EraseScreen() {
-	SendAnsi("[2J")
+	PrintAnsi("[2J")
 }
 

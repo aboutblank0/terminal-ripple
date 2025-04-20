@@ -1,18 +1,16 @@
 package main
 
-import (
-	"aboutblank0/simple-gui/simplegui"
-	"time"
-)
+import "aboutblank0/terminal-ripple/ripple"
 
 
 func main() {
-	app, err := simplegui.NewApplication()
+	app, err := ripple.NewApplication()
 	if err != nil {
 		panic(err)
 	}
 
-	app.Start()
-	time.Sleep(time.Second * 2)
-	app.Stop()
+	err = app.Start()
+	if err != nil {
+		panic(err)
+	}
 }
