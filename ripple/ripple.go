@@ -1,97 +1,70 @@
 package ripple
 
 import (
-	"aboutblank0/terminal-ripple/terminal"
 	"os"
+	"time"
 
 	"golang.org/x/term"
 )
 
-type RippleApp struct {
-	Screen   *terminal.Screen
-	Running  bool
-	Fd       int
-	oldState *term.State
-}
-
-func NewApplication() (app *RippleApp, err error) {
-	width, height, err := term.GetSize(int(os.Stdin.Fd()))
+func Start() {
+	fd := int(os.Stdin.Fd())
+	width, height, err := term.GetSize(fd)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	screen := terminal.NewScreen(width, height)
-	return &RippleApp{
-		Screen:   screen,
-		Fd:       int(os.Stdin.Fd()),
-		Running:  false,
-		oldState: nil,
-	}, nil
+	screen := NewScreen(width, height)
+
+	screen.Enable()
+	defer screen.Disable()
+
+	oldState, err := term.MakeRaw(fd)
+	if err != nil {
+		panic(err)
+	}
+	defer term.Restore(fd, oldState)
+
+	run(screen)
 }
 
-func (app *RippleApp) Start() error {
-	err := app.makeRaw()
-	if err != nil {
-		return err
-	}
+var running bool = false
 
-	app.Running = true
-	for app.Running {
-		input, err := app.ReadInput()
-		if err != nil {
-			break
+func run(screen *Screen) {
+	running = true
+
+	inputChan := make(chan byte)
+	go readInputLoop(inputChan)
+
+	for running {
+		//Handle Input
+		handleInput(inputChan)
+
+		//Render
+		screen.SetRandomCell()
+
+		//Shleep
+		time.Sleep(16 * time.Millisecond)
+	}
+}
+
+func handleInput(inputChan <-chan byte) {
+	select {
+	case b := <-inputChan:
+		switch b {
+		case 'q', 3:
+			running = false
 		}
-
-		app.handleInput(input)
-	}
-	return nil
-}
-
-func (app *RippleApp) Stop() {
-	app.Running = false
-	app.restore()
-}
-
-func (app *RippleApp) ReadInput() ([]byte, error) {
-	buf := make([]byte, 1)
-	_, err := os.Stdin.Read(buf)
-	if err != nil {
-		return nil, err
-	}
-	return buf, nil
-}
-
-func (app *RippleApp) handleInput(input []byte) {
-	if len(input) == 0 {
-		return
-	}
-
-	switch input[0] {
-	case 'q', 3: // 3 - Ctrl+c
-		app.Stop()
+	default:
 	}
 }
 
-func (app *RippleApp) makeRaw() error {
-	terminal.PrintAnsi("[?47h") // Save Screen
-	terminal.PrintAnsi("[s")    //Save Cursor
-	terminal.PrintAnsi("[?25l") //Cursor Invis
-
-	oldState, err := term.MakeRaw(app.Fd)
-	if err != nil {
-		return err
+func readInputLoop(ch chan<- byte) {
+	for {
+		var b [1]byte
+		_, err := os.Stdin.Read(b[:])
+		if err == nil {
+			ch <- b[0]
+		}
 	}
-
-	app.oldState = oldState
-	return nil
-}
-
-func (app *RippleApp) restore() error {
-	err := term.Restore(app.Fd, app.oldState)
-
-	terminal.PrintAnsi("[?47l") //Restore Screen
-	terminal.PrintAnsi("[u")    //Restore Cursor
-	terminal.PrintAnsi("[?25h") //Curosr Visible
-
-	return err
 }

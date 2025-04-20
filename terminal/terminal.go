@@ -4,8 +4,6 @@ import (
 	"fmt"
 )
 
-const ESC = "\033"
-
 type BackgroundColor int
 
 const (
@@ -20,17 +18,25 @@ const (
 	DefaultColor                 = 8
 )
 
-func PrintAnsi(ansi string) {
-	fmt.Printf("%s%s", ESC, ansi)
+const ESC = "\033"
+func printAnsi(ansi string) { fmt.Printf("%s%s", ESC, ansi) }
+
+func EraseScreen() { printAnsi("[2J") }
+
+func SaveScreen() { printAnsi("[?47h") }
+func RestoreScreen() { printAnsi("[?47l") }
+
+func SaveCursor() { printAnsi("[s") }
+func RestoreCursor() { printAnsi("[u") }
+
+func SetCursorInvisible() { printAnsi("[?25l") }
+func SetCursorVisible() { printAnsi("[?25h") }
+
+
+func MoveCursor(x, y int) {
+	printAnsi(fmt.Sprintf("[%d;%dH", y, x))
 }
 
 func SetBackgroundColor(color BackgroundColor) {
-	EraseScreen()
-	s := fmt.Sprintf("[48;5;%vm", color)
-	PrintAnsi(s)
+	printAnsi(fmt.Sprintf("[48;5;%dm", color))
 }
-
-func EraseScreen() {
-	PrintAnsi("[2J")
-}
-
