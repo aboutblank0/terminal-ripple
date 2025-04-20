@@ -3,7 +3,6 @@ package ripple
 import (
 	"aboutblank0/terminal-ripple/terminal"
 	"fmt"
-	"math/rand"
 )
 
 type Screen struct {
