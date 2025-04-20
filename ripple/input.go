@@ -15,19 +15,20 @@ type MouseInput struct {
 	Button int
 }
 
-func getInputChannel() <- chan []byte {
+func getInputChannel() <-chan []byte {
 	inputCh := make(chan []byte)
 	go readInputLoop(inputCh)
 	return inputCh
 }
 
-func getInput(ch <- chan []byte) Input {
+func getInput(ch <-chan []byte) Input {
 	select {
 	case b := <-ch:
 		switch len(b) {
 		case 1:
 			return Input{Key: b[0]}
 		case 6:
+			//Kind of bad to assume any 6 byte slice is guaranteed to be a mouse input, but... meh
 			mouseInput := getMouseInput([6]byte(b))
 			return Input{Mouse: &mouseInput}
 

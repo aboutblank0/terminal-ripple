@@ -9,7 +9,7 @@ type Screen struct {
 	Enabled bool
 	Width   int
 	Height  int
-	Cells   [][]*Cell
+	Cells   [][]Cell
 }
 
 type Cell struct {
@@ -22,11 +22,11 @@ func NewScreen(width, height int) *Screen {
 	screen.Width = width
 	screen.Height = height
 
-	cols := make([][]*Cell, height)
+	cols := make([][]Cell, height)
 	for y := range height {
-		cols[y] = make([]*Cell, width)
+		cols[y] = make([]Cell, width)
 		for x := range cols[y] {
-			cols[y][x] = &Cell{Color: terminal.BlackColor, Content: string(' ')}
+			cols[y][x] = Cell{Color: terminal.BlackColor, Content: string(' ')}
 		}
 	}
 
