@@ -28,15 +28,12 @@ func RestoreScreen() { printAnsi("[?47l") }
 
 func SaveCursor() { printAnsi("[s") }
 func RestoreCursor() { printAnsi("[u") }
+func MoveCursor(x, y int) { printAnsi(fmt.Sprintf("[%d;%dH", y, x)) }
 
 func SetCursorInvisible() { printAnsi("[?25l") }
 func SetCursorVisible() { printAnsi("[?25h") }
 
+func SetForegroundColor(color BackgroundColor) { printAnsi(fmt.Sprintf("[38;5;%dm", color)) }
+func SetBackgroundColor(color BackgroundColor) { printAnsi(fmt.Sprintf("[48;5;%dm", color)) }
 
-func MoveCursor(x, y int) {
-	printAnsi(fmt.Sprintf("[%d;%dH", y, x))
-}
-
-func SetBackgroundColor(color BackgroundColor) {
-	printAnsi(fmt.Sprintf("[48;5;%dm", color))
-}
+func ResetAttributes() { printAnsi("[0m") }

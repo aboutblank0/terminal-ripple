@@ -37,13 +37,11 @@ func run(screen *Screen) {
 	go readInputLoop(inputChan)
 
 	for running {
-		//Handle Input
 		handleInput(inputChan)
 
-		//Render
-		screen.SetRandomCell()
+		screen.Render()
 
-		//Shleep
+		//Shleep (~60 fps)
 		time.Sleep(16 * time.Millisecond)
 	}
 }
@@ -59,9 +57,9 @@ func handleInput(inputChan <-chan byte) {
 	}
 }
 
+var b [1]byte
 func readInputLoop(ch chan<- byte) {
 	for {
-		var b [1]byte
 		_, err := os.Stdin.Read(b[:])
 		if err == nil {
 			ch <- b[0]
