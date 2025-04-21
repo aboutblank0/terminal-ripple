@@ -1,4 +1,4 @@
-package ripple
+package terminal
 
 import (
 	"os"

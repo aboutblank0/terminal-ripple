@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 type BackgroundColor int
@@ -15,8 +16,13 @@ const (
 	MagentaColor                 = 5
 	CyanColor                    = 6
 	WhiteColor                   = 7
-	DefaultColor                 = 8
+	MaxColor                     = 8
 )
+
+func GetRandomColor() BackgroundColor {
+	randColor := rand.Intn(MaxColor) + 1
+	return BackgroundColor(randColor)
+}
 
 const ESC = "\x1b"
 
