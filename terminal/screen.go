@@ -2,47 +2,65 @@ package terminal
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Screen struct {
-	Enabled bool
-	Width   int
-	Height  int
-	Cells   [][]Cell
+	Enabled    bool
+	Width      int
+	Height     int
+	cells      [][]Cell
+	dirtyCells []Cell
 }
 
 type Cell struct {
-	Color   BackgroundColor
-	Content string
+	Color BackgroundColor
+	x, y  int
 }
+
+const EMPTY = " "
 
 func newScreen(width, height int) *Screen {
 	screen := new(Screen)
 	screen.Width = width
 	screen.Height = height
 
-	cols := make([][]Cell, height)
+	cells := make([][]Cell, height)
+	dirtyCells := make([]Cell, 0, width * height)
 	for y := range height {
-		cols[y] = make([]Cell, width)
-		for x := range cols[y] {
-			cols[y][x] = Cell{Color: BlackColor, Content: string(' ')}
+		cells[y] = make([]Cell, width)
+		for x := range cells[y] {
+			cells[y][x] = Cell{x: x, y: y, Color: BlackColor}
+			dirtyCells = append(dirtyCells, cells[y][x])
 		}
 	}
+	screen.cells = cells
+	screen.dirtyCells = dirtyCells
 
-	screen.Cells = cols
 	return screen
 }
 
-// TODO: Fix how many times this is called
-// Possible fix would be to draw in order of COLORS
+func (s *Screen) SetCell(x, y int, color BackgroundColor) {
+	cell := s.cells[y][x]
+	cell.Color = color
+	s.cells[y][x] = cell
+
+	s.dirtyCells = append(s.dirtyCells, cell)
+}
+
 func (s *Screen) render() {
-	MoveCursor(0, 0)
-	for y := range s.Cells {
-		for _, cell := range s.Cells[y] {
-			SetBackgroundColor(cell.Color)
-			fmt.Print(cell.Content)
-		}
+	var builder strings.Builder
+	
+	// Render only dirty cells
+	for _, cell := range s.dirtyCells {
+		builder.WriteString(GetMoveCursorCode(cell.x, cell.y))
+		builder.WriteString(GetSetBackgroundColorCode(cell.Color))
+		builder.WriteString(EMPTY)
 	}
+
+	fmt.Print(builder.String())
+
+	s.dirtyCells = s.dirtyCells[:0]
 
 	ResetAttributes()
 }

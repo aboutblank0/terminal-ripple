@@ -18,14 +18,14 @@ func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor ter
 	for _, ripple := range ripples {
 		for _, pos := range ripple.LastAffected {
 			x, y := pos[0], pos[1]
-			screen.Cells[y][x].Color = originalColor
+			screen.SetCell(x, y, originalColor)
 		}
 
 		// Reset previously affected cells
 		ripple.LastAffected = ripple.LastAffected[:0] // Clear the list
 
-		for y := range screen.Cells {
-			for x := range screen.Cells[0] {
+		for y := range screen.Height {
+			for x := range screen.Width {
 				dx := x - ripple.CenterX
 				dy := y - ripple.CenterY
 
@@ -34,7 +34,7 @@ func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor ter
 
 				r := math.Abs(dist - ripple.Radius)
 				if r < threshold {
-					screen.Cells[y][x].Color = ripple.Color
+					screen.SetCell(x, y, ripple.Color)
 					ripple.LastAffected = append(ripple.LastAffected, [2]int{x, y})
 				}
 			}
@@ -43,7 +43,7 @@ func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor ter
 }
 
 func UpdateRipples(ripples []*Ripple, deltaTime float64) {
-	rippleSpeed := 20.0
+	rippleSpeed := 50.0
 
 	for _, ripple := range ripples {
 		ripple.ElapsedTime += deltaTime

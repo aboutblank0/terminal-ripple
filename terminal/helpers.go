@@ -34,15 +34,18 @@ func SaveScreen()    { printAnsi("[?47h") }
 func RestoreScreen() { printAnsi("[?47l") }
 
 // Cursor
-func SaveCursor()         { printAnsi("[s") }
-func RestoreCursor()      { printAnsi("[u") }
-func MoveCursor(x, y int) { printAnsi(fmt.Sprintf("[%d;%dH", y, x)) }
-func SetCursorInvisible() { printAnsi("[?25l") }
-func SetCursorVisible()   { printAnsi("[?25h") }
+func SaveCursor()                       { printAnsi("[s") }
+func RestoreCursor()                    { printAnsi("[u") }
+func SetCursorInvisible()               { printAnsi("[?25l") }
+func SetCursorVisible()                 { printAnsi("[?25h") }
+func MoveCursor(x, y int)               { printAnsi(fmt.Sprintf("[%d;%dH", y, x)) }
+func GetMoveCursorCode(x, y int) string { return fmt.Sprintf("%s[%d;%dH", ESC, y, x) }
 
 // Back/Foreground
-func SetForegroundColor(color BackgroundColor) { printAnsi(fmt.Sprintf("[38;5;%dm", color)) }
 func SetBackgroundColor(color BackgroundColor) { printAnsi(fmt.Sprintf("[48;5;%dm", color)) }
+func GetSetBackgroundColorCode(color BackgroundColor) string {
+	return fmt.Sprintf("%s[48;5;%dm", ESC, color)
+}
 
 // Mouse
 func EnableMouseTracking()  { printAnsi("[?1000h") }

@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -8,9 +9,9 @@ import (
 )
 
 type TerminalApp struct {
-	Running bool
-	Screen  *Screen
-	Fd      int
+	Running  bool
+	Screen   *Screen
+	Fd       int
 	Elements []AppElement
 }
 
@@ -19,6 +20,9 @@ type AppElement interface {
 	Render(screen *Screen)
 }
 
+const TARGET_FPS = 60
+const TARGET_FRAME_TIME = time.Second / TARGET_FPS
+
 func NewApp() (*TerminalApp, error) {
 	fd := int(os.Stdin.Fd())
 	width, height, err := term.GetSize(fd)
@@ -26,11 +30,11 @@ func NewApp() (*TerminalApp, error) {
 		return nil, err
 	}
 
-	screen := newScreen(width, height)
+	screen := newScreen(width, height-1)
 	return &TerminalApp{
-		Running: false,
-		Screen:  screen,
-		Fd:      fd,
+		Running:  false,
+		Screen:   screen,
+		Fd:       fd,
 		Elements: make([]AppElement, 0),
 	}, nil
 }
@@ -70,9 +74,16 @@ func run(app *TerminalApp) {
 		update(app, delta, input)
 
 		render(app)
+
+		fmt.Printf("\x1b[%d;1H\x1b[2KFPS: %d", app.Screen.Height+1, int(1.0/delta))
+
+		//Target FPS 
+		elapsed := time.Since(now)
+		if sleepTime := TARGET_FRAME_TIME - elapsed; sleepTime > 0 {
+			time.Sleep(sleepTime)
+		}
 	}
 }
-
 
 func update(app *TerminalApp, delta float64, input Input) {
 	if input.Key == 'q' {
