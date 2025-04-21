@@ -7,10 +7,10 @@ A full-screen terminal application that simulates ripple effects on the screen w
 This project was created for fun and learning, and does not use any external libraries, only Go standard libraries.
 
 ## Features
-
-- Full-screen terminal display.
-- Ripple effect where the user clicks on the screen.
-- Lightweight, minimalistic, and easy to use.
+- Optimized, somewhat. Only draw "dirty" cells.
+- Supports Key/Mouse input.
+- Easily extensible
+- Easy to add any kind of rendering you want, provided you know exactly which cells (x, y) to change
 
 ## Usage
 
