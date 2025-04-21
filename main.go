@@ -9,13 +9,17 @@ type Game struct {
 	Ripples []*ripple.Ripple
 }
 
-func (g *Game) Update(screen *terminal.Screen, delta float64, input terminal.Input) {
+func (g *Game) Update(delta float64, input terminal.Input) {
 	if input.Mouse != nil && input.Mouse.Button == 3 {
 		newRipple := ripple.StartRipple(input.Mouse.X, input.Mouse.Y, terminal.GetRandomColor())
 		g.Ripples = append(g.Ripples, newRipple)
 	}
 
-	ripple.UpdateRipples(g.Ripples, screen.Cells, delta, terminal.BlackColor)
+	ripple.UpdateRipples(g.Ripples, delta)
+}
+
+func (g *Game) Render(screen *terminal.Screen) {
+	ripple.RenderRipples(g.Ripples, screen, terminal.BlackColor)
 }
 
 func main() {
@@ -26,7 +30,6 @@ func main() {
 
 	game := new(Game)
 	app.AddElement(game)
-	
-	app.Start()
 
+	app.Start()
 }

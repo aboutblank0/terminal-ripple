@@ -15,7 +15,8 @@ type TerminalApp struct {
 }
 
 type AppElement interface {
-	Update(screen *Screen, delta float64, input Input)
+	Update(delta float64, input Input)
+	Render(screen *Screen)
 }
 
 func NewApp() (*TerminalApp, error) {
@@ -68,7 +69,7 @@ func run(app *TerminalApp) {
 
 		update(app, delta, input)
 
-		app.Screen.render()
+		render(app)
 	}
 }
 
@@ -79,6 +80,14 @@ func update(app *TerminalApp, delta float64, input Input) {
 	}
 
 	for _, element := range app.Elements {
-		element.Update(app.Screen, delta, input)
+		element.Update(delta, input)
 	}
+}
+
+func render(app *TerminalApp) {
+	for _, element := range app.Elements {
+		element.Render(app.Screen)
+	}
+
+	app.Screen.render()
 }

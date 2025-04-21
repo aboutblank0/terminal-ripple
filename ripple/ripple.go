@@ -5,7 +5,6 @@ import (
 	"math"
 )
 
-
 type Ripple struct {
 	CenterX, CenterY int
 	Radius           float64
@@ -14,25 +13,19 @@ type Ripple struct {
 	Color            terminal.BackgroundColor
 }
 
-func UpdateRipples(ripples []*Ripple, grid [][]terminal.Cell, deltaTime float64, originalColor terminal.BackgroundColor) {
-	rippleSpeed := 20.0
+func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor terminal.BackgroundColor) {
 	threshold := 0.8
-
 	for _, ripple := range ripples {
-		// Reset previously affected cells
 		for _, pos := range ripple.LastAffected {
 			x, y := pos[0], pos[1]
-			grid[y][x].Color = originalColor
+			screen.Cells[y][x].Color = originalColor
 		}
+
+		// Reset previously affected cells
 		ripple.LastAffected = ripple.LastAffected[:0] // Clear the list
 
-		// Update ripple
-		ripple.ElapsedTime += deltaTime
-		ripple.Radius = ripple.ElapsedTime * rippleSpeed
-
-		// Apply new ring
-		for y := range grid {
-			for x := range grid[0] {
+		for y := range screen.Cells {
+			for x := range screen.Cells[0] {
 				dx := x - ripple.CenterX
 				dy := y - ripple.CenterY
 
@@ -41,11 +34,20 @@ func UpdateRipples(ripples []*Ripple, grid [][]terminal.Cell, deltaTime float64,
 
 				r := math.Abs(dist - ripple.Radius)
 				if r < threshold {
-					grid[y][x].Color = ripple.Color
+					screen.Cells[y][x].Color = ripple.Color
 					ripple.LastAffected = append(ripple.LastAffected, [2]int{x, y})
 				}
 			}
 		}
+	}
+}
+
+func UpdateRipples(ripples []*Ripple, deltaTime float64) {
+	rippleSpeed := 20.0
+
+	for _, ripple := range ripples {
+		ripple.ElapsedTime += deltaTime
+		ripple.Radius = ripple.ElapsedTime * rippleSpeed
 	}
 }
 
