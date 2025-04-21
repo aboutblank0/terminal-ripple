@@ -1,5 +1,6 @@
 
 # Ripple Effect Terminal Application
+![alacritty_7mHt3PauSY](https://github.com/user-attachments/assets/5bbe0f59-598b-4619-ba30-a33afdc0cd6d)
 
 A full-screen terminal application that simulates ripple effects on the screen when the user clicks, acting like a mini graphics library.
 
