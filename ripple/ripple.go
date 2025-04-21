@@ -14,7 +14,7 @@ type Ripple struct {
 }
 
 func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor terminal.BackgroundColor) {
-	threshold := 0.8
+	threshold := 0.95
 	for _, ripple := range ripples {
 		for _, pos := range ripple.LastAffected {
 			x, y := pos[0], pos[1]
@@ -59,7 +59,6 @@ func UpdateRipples(ripples *[]*Ripple, deltaTime float64, maxRadius int) {
 
     *ripples = newRipples
 }
-
 
 
 func StartRipple(x, y int, color terminal.BackgroundColor) *Ripple {

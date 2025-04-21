@@ -74,7 +74,8 @@ func run(app *TerminalApp) {
 		update(app, delta, input)
 
 		render(app)
-
+	
+		//Print FPS
 		fmt.Printf("\x1b[%d;1H\x1b[2KFPS: %d", app.Screen.Height+1, int(1.0/delta))
 
 		//Target FPS 
