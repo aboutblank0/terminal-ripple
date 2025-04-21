@@ -30,7 +30,7 @@ func NewApp() (*TerminalApp, error) {
 		return nil, err
 	}
 
-	screen := newScreen(width, height-1)
+	screen := newScreen(width, height)
 	return &TerminalApp{
 		Running:  false,
 		Screen:   screen,
@@ -65,11 +65,11 @@ func run(app *TerminalApp) {
 
 	last := time.Now()
 	for app.Running {
-		input := getInput(inputCh)
-
 		now := time.Now()
 		delta := now.Sub(last).Seconds()
 		last = now
+
+		input := getInput(inputCh)
 
 		update(app, delta, input)
 

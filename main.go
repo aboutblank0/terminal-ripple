@@ -3,10 +3,12 @@ package main
 import (
 	"aboutblank0/terminal-ripple/ripple"
 	"aboutblank0/terminal-ripple/terminal"
+	"math"
 )
 
 type Game struct {
-	Ripples []*ripple.Ripple
+	Ripples   []*ripple.Ripple
+	MaxRadius int
 }
 
 func (g *Game) Update(delta float64, input terminal.Input) {
@@ -15,7 +17,7 @@ func (g *Game) Update(delta float64, input terminal.Input) {
 		g.Ripples = append(g.Ripples, newRipple)
 	}
 
-	ripple.UpdateRipples(g.Ripples, delta)
+	ripple.UpdateRipples(&g.Ripples, delta, g.MaxRadius)
 }
 
 func (g *Game) Render(screen *terminal.Screen) {
@@ -29,7 +31,10 @@ func main() {
 	}
 
 	game := new(Game)
+	game.MaxRadius = int(math.Sqrt(float64(app.Screen.Width*app.Screen.Width + app.Screen.Height*app.Screen.Height))) + 30 //some more
 	app.AddElement(game)
 
 	app.Start()
 }
+
+

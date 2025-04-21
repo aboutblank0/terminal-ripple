@@ -42,14 +42,25 @@ func RenderRipples(ripples []*Ripple, screen *terminal.Screen, originalColor ter
 	}
 }
 
-func UpdateRipples(ripples []*Ripple, deltaTime float64) {
-	rippleSpeed := 50.0
+func UpdateRipples(ripples *[]*Ripple, deltaTime float64, maxRadius int) {
+    rippleSpeed := 50.0
 
-	for _, ripple := range ripples {
-		ripple.ElapsedTime += deltaTime
-		ripple.Radius = ripple.ElapsedTime * rippleSpeed
-	}
+    for _, ripple := range *ripples {
+        ripple.ElapsedTime += deltaTime
+        ripple.Radius = ripple.ElapsedTime * rippleSpeed
+    }
+
+    var newRipples []*Ripple
+    for _, ripple := range *ripples {
+        if ripple.Radius <= float64(maxRadius) {
+            newRipples = append(newRipples, ripple)
+        }
+    }
+
+    *ripples = newRipples
 }
+
+
 
 func StartRipple(x, y int, color terminal.BackgroundColor) *Ripple {
 	return &Ripple{
